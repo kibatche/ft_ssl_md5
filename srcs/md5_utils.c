@@ -1,7 +1,8 @@
 #include "ft_ssl.h"
 
 //P is what we add after the message. It will never have more than 64 values
-const uint32_t P[64] = {
+// uint8_t, see rfc
+const uint8_t P[64] = {
     128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -12,7 +13,7 @@ uint8_t *md5_padding(uint8_t *message, int len, int *final_len_byte)
 {
     uint32_t remaining = len % 64;
     uint32_t paddingLen = 0;
-    if (remaining > 56)
+    if (remaining >= 56)
         paddingLen = 56 - (64 - remaining);
     else
         paddingLen = 56 - remaining;
@@ -20,7 +21,7 @@ uint8_t *md5_padding(uint8_t *message, int len, int *final_len_byte)
     uint8_t *padded_message = malloc(sizeof(char) * (*final_len_byte));
     if (padded_message == NULL)
         print_error("malloc failed.\n");
-    uint64_t len64 = (uint64_t)len;
+    uint64_t len64 = (uint64_t)len * 8;// stupid I am : the len MUST BE in bits not in bytes...
     ft_memcpy(padded_message, message, len);
 // we add the bit '1' to the message + the '0'
     ft_memcpy(padded_message + len, P, paddingLen);
