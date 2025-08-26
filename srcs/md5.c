@@ -34,7 +34,7 @@ char *md5_sum(uint8_t *message, uint32_t len)
     int final_len_byte = 0;
 
     uint8_t *padded_message = md5_padding(message, len, &final_len_byte);
-    chunked_message *chunked_msg_array = split_message_into_chuncks(padded_message, final_len_byte);
+    chunked_message *chunked_msg_array = md5_split_message_into_chuncks(padded_message, final_len_byte);
     int number_of_chunks = final_len_byte / 64; 
 
     for (int n = 0; n < number_of_chunks; n++)// n is the index inside the chunked message array
