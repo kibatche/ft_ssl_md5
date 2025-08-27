@@ -4,7 +4,16 @@ static void printReverseEndian(unsigned n) {
   printf("%02x%02x%02x%02x", n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, n >> 24);
 }
 
-char *md5_sum(uint8_t *message, uint32_t len)
+static int md5_state(int i)
+{
+    if (i <= 15) return ROUND_1;
+    else if (i <= 31) return ROUND_2;
+    else if (i <= 47) return ROUND_3;
+    else if (i <= 63) return ROUND_4;
+    return -1;
+}
+
+void md5_sum(uint8_t *message, uint32_t len)
 {
     // the k constant (for i from 0 to 63 do K[i] := floor(232 × abs(sin(i + 1))) end for)
     const uint32_t K[64] = {
@@ -31,11 +40,11 @@ char *md5_sum(uint8_t *message, uint32_t len)
     uint32_t B = 0xEFCDAB89;
     uint32_t C = 0x98BADCFE;
     uint32_t D = 0x10325476;
-    int final_len_byte = 0;
+    int padded_message_len = 0;
 
-    uint8_t *padded_message = md5_padding(message, len, &final_len_byte);
-    chunked_message *chunked_msg_array = md5_split_message_into_chuncks(padded_message, final_len_byte);
-    int number_of_chunks = final_len_byte / 64; 
+    uint8_t *padded_message = pad_message(message, len, &padded_message_len);
+    chunked_message *chunked_msg_array = split_message_into_chuncks_md5(padded_message, padded_message_len);
+    int number_of_chunks = padded_message_len / 64; 
 
     for (int n = 0; n < number_of_chunks; n++)// n is the index inside the chunked message array
     {
@@ -47,7 +56,7 @@ char *md5_sum(uint8_t *message, uint32_t len)
         {
             uint32_t f = 0;
             uint32_t g = 0;
-            switch(state(i)) {
+            switch(md5_state(i)) {
                 case ROUND_1:
                     f = F(b_cpy, c_cpy, d_cpy);
                     g = i;
@@ -72,7 +81,7 @@ char *md5_sum(uint8_t *message, uint32_t len)
             a_cpy = d_cpy;
             d_cpy = c_cpy;
             c_cpy = b_cpy;
-            b_cpy = b_cpy + rotate_left(f, S[i]);
+            b_cpy = b_cpy + ROTL(f, S[i]);
         }
         A += a_cpy;
         B += b_cpy;
@@ -84,5 +93,6 @@ char *md5_sum(uint8_t *message, uint32_t len)
     printReverseEndian(C);
     printReverseEndian(D);
     REEF(padded_message);
-    return "";
+    REEF(chunked_msg_array->word);
+    REEF(chunked_msg_array);
 }
