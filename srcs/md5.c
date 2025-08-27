@@ -1,8 +1,6 @@
 #include "ft_ssl.h"
 
-static void printReverseEndian(unsigned n) {
-  printf("%02x%02x%02x%02x", n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, n >> 24);
-}
+extern char *message;
 
 static int md5_state(int i)
 {
@@ -13,8 +11,9 @@ static int md5_state(int i)
     return -1;
 }
 
-void md5_sum(uint8_t *message, uint32_t len)
+void md5_sum()
 {
+    unsigned int len = ft_strlen(message);
     // the k constant (for i from 0 to 63 do K[i] := floor(232 × abs(sin(i + 1))) end for)
     const uint32_t K[64] = {
         0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
@@ -32,7 +31,7 @@ void md5_sum(uint8_t *message, uint32_t len)
         7, 12, 17, 22, 7, 12, 17, 22,  7, 12, 17, 22, 7, 12, 17, 22,
         5,  9, 14, 20, 5,  9, 14, 20,  5,  9, 14, 20, 5,  9, 14, 20,
         4, 11, 16, 23, 4, 11, 16, 23,  4, 11, 16, 23, 4, 11, 16, 23,
-        6, 10, 15, 21, 6, 10, 15, 21,  6, 10, 15, 21, 6, 10, 15, 21 
+        6, 10, 15, 21, 6, 10, 15, 21,  6, 10, 15, 21, 6, 10, 15, 21
     };
 
     //32-bits words constants
@@ -40,11 +39,12 @@ void md5_sum(uint8_t *message, uint32_t len)
     uint32_t B = 0xEFCDAB89;
     uint32_t C = 0x98BADCFE;
     uint32_t D = 0x10325476;
+
     int padded_message_len = 0;
 
     uint8_t *padded_message = pad_message(message, len, &padded_message_len);
     chunked_message *chunked_msg_array = split_message_into_chuncks_md5(padded_message, padded_message_len);
-    int number_of_chunks = padded_message_len / 64; 
+    int number_of_chunks = padded_message_len / 64;
 
     for (int n = 0; n < number_of_chunks; n++)// n is the index inside the chunked message array
     {
@@ -74,8 +74,12 @@ void md5_sum(uint8_t *message, uint32_t len)
                     g = (7 * i) % 16;
                     break;
                 default:
+                    REEF(message);
                     REEF(padded_message);
+                    REEF(chunked_msg_array->word);
+                    REEF(chunked_msg_array);
                     print_error("Wrong state inside the function state(). You should check the variable i.");
+                    break;
             };
             f = f + a_cpy + K[i] + chunked_msg_array[n].word[g];
             a_cpy = d_cpy;
@@ -89,6 +93,7 @@ void md5_sum(uint8_t *message, uint32_t len)
         D += d_cpy;
     }
     printf("%x%x%x%x\n", bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
+    REEF(message);
     REEF(padded_message);
     REEF(chunked_msg_array->word);
     REEF(chunked_msg_array);

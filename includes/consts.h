@@ -1,13 +1,17 @@
 #ifndef CONSTS_H
 # define CONSTS_H
 
-typedef int HASH_MODE;
-
 # define LENDIAN 0
 # define BENDIAN 1
 
-# define MD5 0
-# define SHA256 1
-# define NO_MODE 99 
+# define MD5_STRING "md5"
+# define SHA256_STRING "sha256"
 
+# define NUMBER_OF_HASH_FUNCTIONS 2
+
+# define ERR_USAGE "Usage : ./ft_ssl md5|sha256 [-pqrs] [FILE]"
+# define ERR_MALLOC "malloc() failed."
+
+# define ERROR 1
+# define SUCCESS 0
 #endif

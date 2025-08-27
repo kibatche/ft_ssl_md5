@@ -5,10 +5,14 @@ chunked_message *split_message_into_chuncks_sha256(uint8_t *padded_message, int 
     // we need to chunk the msg by 64 bytes blocks.
     // but we don't need the chunks, only the words inside the chunks for md5 and sha256.
     int k = 0;
-    
+
     chunked_message *chunk_array = malloc(sizeof(chunked_message) * (padded_message_len / 64));
-    if (chunk_array == NULL) print_error("malloc failed.\n");
-    
+    if (chunk_array == NULL)
+    {
+        REEF(message)
+        print_error("malloc failed.\n");
+    }
+
     chunk_array->word = malloc(sizeof(uint32_t) * 64);
     if (chunk_array->word == NULL) print_error("malloc failed.\n");
 
