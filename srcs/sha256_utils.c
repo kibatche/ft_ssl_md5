@@ -30,10 +30,10 @@ chunked_message *split_message_into_chuncks_sha256(uint8_t *padded_message, int 
         for (int j = 16; j < 64; j++)
         {
             chunk_array[i].word[j] =          \
-            __bswap_32(s1(chunk_array[i].word[j - 2])  + \
+            s1(chunk_array[i].word[j - 2])  + \
             chunk_array[i].word[j - 7]      + \
             s0(chunk_array[i].word[j - 15]) + \
-            chunk_array[i].word[j - 16]);
+            chunk_array[i].word[j - 16];
         }
     }
     return chunk_array;

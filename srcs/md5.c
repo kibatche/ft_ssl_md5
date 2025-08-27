@@ -88,10 +88,7 @@ void md5_sum(uint8_t *message, uint32_t len)
         C += c_cpy;
         D += d_cpy;
     }
-    printReverseEndian(A);
-    printReverseEndian(B);
-    printReverseEndian(C);
-    printReverseEndian(D);
+    printf("%x%x%x%x\n", bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
     REEF(padded_message);
     REEF(chunked_msg_array->word);
     REEF(chunked_msg_array);

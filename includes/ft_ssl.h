@@ -1,6 +1,7 @@
 #ifndef FT_SSL_H
 # define  FT_SSL_H
 
+# include <byteswap.h>
 # include <endian.h>
 # include <limits.h>
 # include <stdint.h>

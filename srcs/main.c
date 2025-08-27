@@ -13,13 +13,13 @@ static int choosen_hash_digest(char *arg)
         return SHA256;
     }
     else
-        print_error("Usage : ./ft_ssl [md5 | sha256] FILE\n");
+        print_error("Usage : ./ft_ssl md5|sha256 [-pqrs] [FILE]\n");
     return -1;
 }
 
 int main(int ac, char **av)
 {
-    (void)ac;
+    ac == 1 ? print_error("Usage : ./ft_ssl md5|sha256 [-pqrs] [FILE]\n") : 0;
     if (check_current_machine_endianess() == BENDIAN)
         print_error("This program must be run on a LITTLE ENDIAN system. Wait the PRO version for BIG ENDIAN.\n");
     void (*hash_function[2])(uint8_t *, uint32_t) = {md5_sum, sha256_sum};

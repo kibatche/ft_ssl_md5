@@ -12,8 +12,8 @@ LIB_EXE = libft/libft.a
 INCL = -I ./includes -I ./libft
 LIB_COMPIL = -L./libft -lft
 RM = rm -rf
-NAME = ft_ssl_md5
-NAME_DEBUG = ft_ssl_md5_debug
+NAME = ft_ssl
+NAME_DEBUG = ft_ssl_debug
 
 all: ${ODIR} ${NAME}
 debug: ${ODIR_DEBUG} ${NAME_DEBUG}
