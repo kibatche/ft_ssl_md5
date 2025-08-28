@@ -2,10 +2,8 @@
 
 extern char *message;
 
-void sha256_sum()
+void sha256_sum(unsigned int len)
 {
-    unsigned int len = ft_strlen(message);
-
     // ALL constants seem to be already in BIG ENDIAN from the NIST SPEC.
     uint32_t K[64] = {
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -64,12 +62,12 @@ void sha256_sum()
         h6 += g;
         h7 += h;
     }
-    printf("%08x%08x%08x%08x%08x%08x%08x%08x\n", h0, h1, h2, h3, h4, h5, h6, h7);
-    REEF(message);
     REEF(padded_message);
     for (int i = 0; i < (padded_message_len / 64); i++)
     {
         REEF(chunked_msg_array[i].word);
     }
     REEF(chunked_msg_array);
+    printf("%08x%08x%08x%08x%08x%08x%08x%08x\n", h0, h1, h2, h3, h4, h5, h6, h7);
+    REEF(message);
 }

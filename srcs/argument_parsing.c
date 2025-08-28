@@ -4,20 +4,30 @@ extern programm_info p_info;
 extern hash_function h_functions[NUMBER_OF_HASH_FUNCTIONS];
 extern char *message;
 
+bool is_an_hash_was_printed = false;
+char *current_processed_filename;
+
 void parse_hash_mode(char *hash_mode)
 {
-    if (strcmp(hash_mode, MD5_STRING) == 0)         p_info.hash_mode = MD5_HASH_MODE;
-    else if (strcmp(hash_mode, SHA256_STRING) == 0) p_info.hash_mode = SHA256_HASH_MODE;
+    if (strcmp(hash_mode, MD5_STRING) == 0)
+    {
+        p_info.hash_mode = MD5_HASH_MODE;
+    }
+    else if (strcmp(hash_mode, SHA256_STRING) == 0)
+    {
+        p_info.hash_mode = SHA256_HASH_MODE;
+    }
     else print_error(ERR_USAGE);
 }
 
 char *parse_stdin()
 {
     char buf[2];
-    char *tmp;
+    char *tmp = NULL;
     char *to_hash = ft_strdup("");
     int ret = 0;
 
+    ft_bzero(buf, 2);
     if (to_hash == NULL)    print_error(ERR_MALLOC);
     while ((ret = read(STDIN_FILENO, buf, 1)) > 0)
     {
@@ -35,12 +45,13 @@ char *parse_stdin()
     return to_hash;
 }
 
-char *read_file(int fd)
+char *read_file(int fd, unsigned int **filelen)
 {
     unsigned int len = 0;
     char *to_hash = NULL;
 
     len = lseek(fd, 0, SEEK_END);
+    **filelen = len;
     lseek(fd, 0, SEEK_SET);//reset the pointer
     to_hash = malloc(sizeof(char) * (len + 1));
     if (to_hash == NULL)
@@ -58,18 +69,23 @@ char *read_file(int fd)
     return to_hash;
 }
 
-char *parse_file(char *path)
+char *parse_file(char *path, unsigned int *filelen)
 {
     char *to_hash = NULL;
-    char *cwd;
-    char *full_path;
+    char *cwd = NULL;
+    char *full_path = NULL;
     unsigned int len_read = 0;
 
     if (access(path, R_OK) == 0)
     {
         int fd = open(path, O_RDONLY);
-        if (fd == -1) print_error("open failed.");
-        to_hash = read_file(fd);
+        if (fd == -1)
+        {
+            int err = errno;
+            ft_putstr_fd(strerror(err), 2);
+            return NULL;
+        }
+        to_hash = read_file(fd, &filelen);
         close(fd);
         return to_hash;
     }
@@ -88,43 +104,55 @@ char *parse_file(char *path)
     if (access(full_path, R_OK) == 0)
     {
         int fd = open(path, O_RDONLY);
-        if (fd == -1) print_error("open failed.");
+        if (fd == -1)
+        {
+            REEF(full_path);
+            int err = errno;
+            ft_putstr_fd(strerror(err), 2);
+            return NULL;
+        }
         REEF(full_path);
-        to_hash = read_file(fd);
+        to_hash = read_file(fd, &filelen);
         close(fd);
         return to_hash;
     }
-    else
-    {
-        REEF(full_path);
-        print_error("No such file or directory.");
-    }
+    int err = errno;
+    ft_putstr_fd(strerror(err), 2);
+    REEF(full_path);
     return NULL;
 }
 
 enum PARSING_STATE file_state_parsing(char *token)
 {
-    message = parse_file(token);
-    fflush(NULL);
-    h_functions[p_info.hash_mode]();
+    unsigned int filelen = 0;//we need that because binary files can contain \0. Not suitable with char *.
+    message = parse_file(token, &filelen);
+    if (message == NULL)
+        return FILE_STATE;
+    current_processed_filename = token;
+    h_functions[p_info.hash_mode](filelen);
+    is_an_hash_was_printed = true;
     return FILE_STATE;
 }
 
 enum PARSING_STATE string_state_parsing(char *token)
 {
     message = ft_strdup(token);
-    h_functions[p_info.hash_mode]();
+    h_functions[p_info.hash_mode](ft_strlen(message));
+    is_an_hash_was_printed = true;
     return NO_STATE;
 }
 
 enum PARSING_STATE no_state_parsing(char *token)
 {
+    unsigned int filelen = 0;
     if (strcmp(token, "-p") == 0)
     {
         if (p_info.print_stdin_option == true) print_error(ERR_USAGE);
         p_info.print_stdin_option = true;
+        p_info.handle_mode = STDIN_COMMAND_LINE_HANDLE_MODE;
         message = parse_stdin();
-        h_functions[p_info.hash_mode]();
+        h_functions[p_info.hash_mode](ft_strlen(message));
+        is_an_hash_was_printed = true;
         return NO_STATE;
     }
     if (strcmp(token, "-q") == 0)
@@ -145,10 +173,24 @@ enum PARSING_STATE no_state_parsing(char *token)
         p_info.reverse_option = true;
         return NO_STATE;
     }
-    message = parse_file(token);
-    h_functions[p_info.hash_mode]();
-    return FILE_STATE;
+    return file_state_parsing(token);
 }
+
+void stdin_state_parsing()
+{
+    message = parse_stdin();
+    if (message)
+    {
+        p_info.handle_mode = STDIN_ONLY_HANDLE_MODE;
+        h_functions[p_info.hash_mode](ft_strlen(message));
+        is_an_hash_was_printed = true;
+    }
+    else
+    {
+        print_error(ERR_USAGE);
+    }
+}
+
 
 void parse_arg(int ac, char **av)
 {
@@ -157,6 +199,10 @@ void parse_arg(int ac, char **av)
 
     if (ac == 1) print_error(ERR_USAGE);
     parse_hash_mode(av[1]);
+    if (ac == 2)
+    {
+        stdin_state_parsing();
+    }
     while (++i < ac)
     {
         switch (parsing_state)
@@ -175,4 +221,8 @@ void parse_arg(int ac, char **av)
             break;
         }
     }
+    if (parsing_state == STRING_STATE)//it mean's that the last token was -s without providing a string
+        print_error(ERR_USAGE);
+    if (is_an_hash_was_printed == false)//this is to handle stdin only mode with -q or -r
+        stdin_state_parsing();
 }

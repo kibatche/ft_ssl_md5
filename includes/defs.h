@@ -8,7 +8,7 @@ typedef struct t_chunked_message {
 }               chunked_message;
 
 typedef bool OPTION;
-typedef void (*hash_function)();
+typedef void (*hash_function)(unsigned int);
 
 enum PARSING_STATE {
     NO_STATE,
@@ -25,9 +25,10 @@ enum HASH_MODE {
 
 enum HANDLE_MODE {
     NO_HANDLE_MODE,
+    STDIN_COMMAND_LINE_HANDLE_MODE,
     STDIN_ONLY_HANDLE_MODE,
-    PROMPT_HANDLE_MODE,
-    NORMAL_HANDLE_MODE
+    FILE_HANDLE_MODE,
+    STRING_HANDLE_MODE,
 };
 
 typedef struct  t_programm_info

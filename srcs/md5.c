@@ -11,9 +11,8 @@ static int md5_state(int i)
     return -1;
 }
 
-void md5_sum()
+void md5_sum(unsigned int len)
 {
-    unsigned int len = ft_strlen(message);
     // the k constant (for i from 0 to 63 do K[i] := floor(232 × abs(sin(i + 1))) end for)
     const uint32_t K[64] = {
         0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
@@ -95,12 +94,12 @@ void md5_sum()
         C += c_cpy;
         D += d_cpy;
     }
-    printf("%08x%08x%08x%08x\n", bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
-    REEF(message);
     REEF(padded_message);
     for (int i = 0; i < (padded_message_len / 64); i++)
     {
         REEF(chunked_msg_array[i].word);
     }
     REEF(chunked_msg_array);
+    print_md5_hash(A, B, C, D);
+    REEF(message);
 }

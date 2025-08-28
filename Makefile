@@ -3,7 +3,7 @@ CCFLAGS = -Wall -Wextra -Werror
 CCFLAGS_DEBUG = -g #-Wall -Wextra -Werror -g #-fsanitize=address // cause une erreur de SIG_ACCER
 SOURCE_DIR = srcs/
 SFILES = main.c error_handling.c md5.c md5_utils.c sha256.c sha256_utils.c crypto_utils.c utils.c \
-		 argument_parsing.c
+		 argument_parsing.c print.c
 SRCS = $(addprefix ${SOURCE_DIR}, ${SFILES})
 ODIR = objs/
 ODIR_DEBUG = objs_debug/
