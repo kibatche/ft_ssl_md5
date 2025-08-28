@@ -13,13 +13,14 @@ typedef void (*hash_function)();
 enum PARSING_STATE {
     NO_STATE,
     OPTION_STATE,
-    ARGUMENT_STATE
+    STRING_STATE,
+    FILE_STATE
 };
 
 enum HASH_MODE {
-    NO_HASH_MODE,
     MD5_HASH_MODE,
-    SHA256_HASH_MODE
+    SHA256_HASH_MODE,
+    NO_HASH_MODE,
 };
 
 enum HANDLE_MODE {

@@ -12,6 +12,4 @@
 # define ERR_USAGE "Usage : ./ft_ssl md5|sha256 [-pqrs] [FILE]"
 # define ERR_MALLOC "malloc() failed."
 
-# define ERROR 1
-# define SUCCESS 0
 #endif

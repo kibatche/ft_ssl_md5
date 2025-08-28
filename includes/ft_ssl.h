@@ -3,6 +3,7 @@
 
 # include <byteswap.h>
 # include <endian.h>
+# include <fcntl.h>
 # include <limits.h>
 # include <stdbool.h>
 # include <stdio.h>
@@ -12,9 +13,17 @@
 
 # include "defs.h"
 # include "consts.h"
-# include "get_next_line.h"
 # include "libft.h"
 # include "macros.h"
+
+//parsing
+void parse_hash_mode(char *hash_mode);
+void parse_arg(int ac, char **av);
+char *parse_stdin();
+char *parse_file(char *path);
+enum PARSING_STATE file_state_parsing(char *token);
+enum PARSING_STATE string_state_parsing(char *token);
+enum PARSING_STATE no_state_parsing(char *token);
 
 //md5
 void md5_sum();

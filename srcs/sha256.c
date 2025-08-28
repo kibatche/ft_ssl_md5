@@ -28,7 +28,7 @@ void sha256_sum()
     uint32_t h7 = 0x5be0cd19;
 
     int padded_message_len = 0;
-    uint8_t *padded_message = pad_message(message, len, &padded_message_len);
+    uint8_t *padded_message = pad_message((uint8_t *)message, len, &padded_message_len);
     chunked_message *chunked_msg_array = split_message_into_chuncks_sha256(padded_message, padded_message_len);
     int number_of_chunks = padded_message_len / 64;
 
@@ -64,9 +64,12 @@ void sha256_sum()
         h6 += g;
         h7 += h;
     }
-    printf("%x%x%x%x%x%x%x%x\n", h0, h1, h2, h3, h4, h5, h6, h7);
+    printf("%08x%08x%08x%08x%08x%08x%08x%08x\n", h0, h1, h2, h3, h4, h5, h6, h7);
     REEF(message);
     REEF(padded_message);
-    REEF(chunked_msg_array->word);
+    for (int i = 0; i < (padded_message_len / 64); i++)
+    {
+        REEF(chunked_msg_array[i].word);
+    }
     REEF(chunked_msg_array);
 }

@@ -5,11 +5,11 @@
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
-      "args": ["123"],
+      "args": ["md5", "Makefile"],
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "/home/chbadad/Documents/ft_ssl_md5/",
-      "program": "/home/chbadad/Documents/ft_ssl_md5/ft_ssl_md5_debug",
+      "program": "/home/chbadad/Documents/ft_ssl_md5/ft_ssl_debug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

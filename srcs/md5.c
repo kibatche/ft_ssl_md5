@@ -42,7 +42,7 @@ void md5_sum()
 
     int padded_message_len = 0;
 
-    uint8_t *padded_message = pad_message(message, len, &padded_message_len);
+    uint8_t *padded_message = pad_message((uint8_t *)message, len, &padded_message_len);
     chunked_message *chunked_msg_array = split_message_into_chuncks_md5(padded_message, padded_message_len);
     int number_of_chunks = padded_message_len / 64;
 
@@ -76,7 +76,10 @@ void md5_sum()
                 default:
                     REEF(message);
                     REEF(padded_message);
-                    REEF(chunked_msg_array->word);
+                    for (int i = 0; i < (padded_message_len / 64); i++)
+                    {
+                        REEF(chunked_msg_array[i].word);
+                    }
                     REEF(chunked_msg_array);
                     print_error("Wrong state inside the function state(). You should check the variable i.");
                     break;
@@ -92,9 +95,12 @@ void md5_sum()
         C += c_cpy;
         D += d_cpy;
     }
-    printf("%x%x%x%x\n", bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
+    printf("%08x%08x%08x%08x\n", bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
     REEF(message);
     REEF(padded_message);
-    REEF(chunked_msg_array->word);
+    for (int i = 0; i < (padded_message_len / 64); i++)
+    {
+        REEF(chunked_msg_array[i].word);
+    }
     REEF(chunked_msg_array);
 }

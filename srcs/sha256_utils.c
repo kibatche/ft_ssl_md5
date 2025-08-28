@@ -1,5 +1,7 @@
 #include "ft_ssl.h"
 
+extern char *message;
+
 chunked_message *split_message_into_chuncks_sha256(uint8_t *padded_message, int padded_message_len)
 {
     // we need to chunk the msg by 64 bytes blocks.
@@ -9,15 +11,21 @@ chunked_message *split_message_into_chuncks_sha256(uint8_t *padded_message, int 
     chunked_message *chunk_array = malloc(sizeof(chunked_message) * (padded_message_len / 64));
     if (chunk_array == NULL)
     {
-        REEF(message)
+        REEF(message);
         print_error("malloc failed.\n");
     }
-
-    chunk_array->word = malloc(sizeof(uint32_t) * 64);
-    if (chunk_array->word == NULL) print_error("malloc failed.\n");
-
     for (int i = 0; i < (padded_message_len / 64); i++)
     {
+        chunk_array[i].word = malloc(sizeof(uint32_t) * 64);
+        if (chunk_array[i].word == NULL)
+        {
+            for (int l = 0; l < i; l++)
+            {
+                REEF(chunk_array[l].word);
+            }
+            REEF(message);
+            print_error("malloc failed.\n");
+        }
         // page 22 from NIST.FIPS.180-4.pdf
         // first ( 0 <= j <= 15) we copy the values from the chunk
         for (int j = 0; j < 16; j++)

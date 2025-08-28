@@ -6,10 +6,8 @@ char *message = NULL;
 
 int main(int ac, char **av)
 {
-    ac == 1 ? print_error("Usage : ./ft_ssl md5|sha256 [-pqrs] [FILE]\n") : 0;
     if (check_current_machine_endianess() == BENDIAN)
         print_error("This program must be run on a LITTLE ENDIAN system. Wait the PRO version for BIG ENDIAN.\n");
-    //NE PAS OUBLIER DE CHANGER CA CAR A LA FIN CE SERA UN FICHIER ou STDIN
-    h_functions[p_info.hash_mode]((uint8_t *)av[2], ft_strlen(av[2]));
+    parse_arg(ac, av);
     return 0;
 }
