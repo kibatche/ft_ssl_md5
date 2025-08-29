@@ -3,11 +3,16 @@
 extern programm_info p_info;
 extern char *message;
 extern char *current_processed_filename;
-
+/**
+ * @brief This function change the newline '\n' and the carriage return '\r'
+ * by a their representation to avoid strange looking output (ie : a carriage return printed out on terminal.). 
+ * 
+ * @return char* 
+ */
 char *change_newline()
 {
-    int i = -1;
-    int j = 0;
+    unsigned int i = -1;
+    unsigned int j = 0;
     unsigned int len = 0;
     char *str = NULL;
     
@@ -39,10 +44,21 @@ char *change_newline()
             continue;
         }
         str[j++] = message[i];
+        str[j] = 0;
     }
+    str[len] = '\0';
     return str;
 }
 
+/**
+ * @brief This function print the md5 resulting hash.
+ * It has its own function because the argument from md5 and sha256 are different.
+ * 
+ * @param A 
+ * @param B 
+ * @param C 
+ * @param D 
+ */
 void print_md5_hash(uint32_t A, uint32_t B, uint32_t C, uint32_t D)
 {
     char *to_print = NULL;
@@ -62,6 +78,7 @@ void print_md5_hash(uint32_t A, uint32_t B, uint32_t C, uint32_t D)
                         bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));    
                     break;
                 }
+                // it works like open ssl, not the example provided.
                 printf("MD5(stdin)= %08x%08x%08x%08x\n", \
                         bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
                 break;
@@ -97,6 +114,7 @@ void print_md5_hash(uint32_t A, uint32_t B, uint32_t C, uint32_t D)
                 printf("MD5(\"%s\")= %08x%08x%08x%08x\n", to_print, \
                     bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
                 REEF(to_print);
+                break;
         case FILE_HANDLE_MODE:
                 if (p_info.quiet_option)
                 {
@@ -106,19 +124,34 @@ void print_md5_hash(uint32_t A, uint32_t B, uint32_t C, uint32_t D)
                 }
                 if (p_info.reverse_option)
                 {
-                    printf("%08x%08x%08x%08x \"%s\"\n", \
+                    printf("%08x%08x%08x%08x %s\n", \
                         bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D), \
                         current_processed_filename);
                     REEF(to_print);
                     break;
                 }
-                printf("MD5(\"%s\")= %08x%08x%08x%08x\n", current_processed_filename, \
+                printf("MD5(%s)= %08x%08x%08x%08x\n", current_processed_filename, \
                     bswap_32(A), bswap_32(B), bswap_32(C), bswap_32(D));
+                break;
         default:
+            ft_putstr_fd("Wrong or no HANDLE MODE. Check your code !\n", 2);
             break;
     }
 }
 
+/**
+ * @brief This function print the sha256 resulting hash.
+ * It has its own function because the argument from md5 and sha256 are different.
+ * 
+ * @param h0 
+ * @param h1 
+ * @param h2 
+ * @param h3 
+ * @param h4 
+ * @param h5 
+ * @param h6 
+ * @param h7 
+ */
 void print_sha256_hash(uint32_t h0, uint32_t h1, uint32_t h2, uint32_t h3, uint32_t h4, uint32_t h5, uint32_t h6, uint32_t h7)
 {
     char *to_print = NULL;
@@ -173,6 +206,7 @@ void print_sha256_hash(uint32_t h0, uint32_t h1, uint32_t h2, uint32_t h3, uint3
                 printf("SHA256(\"%s\")= %08x%08x%08x%08x%08x%08x%08x%08x\n", to_print, \
                     h0, h1, h2, h3, h4, h5, h6, h7);
                 REEF(to_print);
+                break;
         case FILE_HANDLE_MODE:
                 if (p_info.quiet_option)
                 {
@@ -182,15 +216,17 @@ void print_sha256_hash(uint32_t h0, uint32_t h1, uint32_t h2, uint32_t h3, uint3
                 }
                 if (p_info.reverse_option)
                 {
-                    printf("%08x%08x%08x%08x%08x%08x%08x%08x \"%s\"\n", \
+                    printf("%08x%08x%08x%08x%08x%08x%08x%08x %s\n", \
                         h0, h1, h2, h3, h4, h5, h6, h7, \
                         current_processed_filename);
                     REEF(to_print);
                     break;
                 }
-                printf("SHA256(\"%s\")= %08x%08x%08x%08x%08x%08x%08x%08x\n", current_processed_filename, \
+                printf("SHA256(%s)= %08x%08x%08x%08x%08x%08x%08x%08x\n", current_processed_filename, \
                     h0, h1, h2, h3, h4, h5, h6, h7);
+                break;
         default:
+            ft_putstr_fd("Wrong or no HANDLE MODE. Check your code !\n", 2);
             break;
     }
 }

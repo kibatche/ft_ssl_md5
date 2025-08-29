@@ -5,7 +5,7 @@
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
-      "args": ["md5", "-p"],
+      "args": ["md5", "-p", "-r", "file"],
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "/home/chbadad/Documents/ft_ssl_md5/",

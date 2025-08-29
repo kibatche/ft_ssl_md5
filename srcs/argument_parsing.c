@@ -74,7 +74,6 @@ char *parse_file(char *path, unsigned int *filelen)
     char *to_hash = NULL;
     char *cwd = NULL;
     char *full_path = NULL;
-    unsigned int len_read = 0;
 
     if (access(path, R_OK) == 0)
     {
@@ -82,7 +81,9 @@ char *parse_file(char *path, unsigned int *filelen)
         if (fd == -1)
         {
             int err = errno;
-            ft_putstr_fd(strerror(err), 2);
+            ft_putstr_fd(path, 2);
+            ft_putstr_fd(": ", 2);
+            ft_putendl_fd(strerror(err), 2);
             return NULL;
         }
         to_hash = read_file(fd, &filelen);
@@ -108,8 +109,10 @@ char *parse_file(char *path, unsigned int *filelen)
         {
             REEF(full_path);
             int err = errno;
-            ft_putstr_fd(strerror(err), 2);
-            return NULL;
+            ft_putstr_fd(path, 2);
+            ft_putstr_fd(": ", 2);
+            ft_putendl_fd(strerror(err), 2);
+            return NULL;;
         }
         REEF(full_path);
         to_hash = read_file(fd, &filelen);
@@ -117,8 +120,10 @@ char *parse_file(char *path, unsigned int *filelen)
         return to_hash;
     }
     int err = errno;
-    ft_putstr_fd(strerror(err), 2);
-    REEF(full_path);
+    ft_putstr_fd(path, 2);
+    ft_putstr_fd(" : ", 2);
+    ft_putendl_fd(strerror(err), 2);
+    REEF(full_path);;
     return NULL;
 }
 
@@ -129,6 +134,7 @@ enum PARSING_STATE file_state_parsing(char *token)
     if (message == NULL)
         return FILE_STATE;
     current_processed_filename = token;
+    p_info.handle_mode = FILE_HANDLE_MODE;
     h_functions[p_info.hash_mode](filelen);
     is_an_hash_was_printed = true;
     return FILE_STATE;
@@ -137,6 +143,7 @@ enum PARSING_STATE file_state_parsing(char *token)
 enum PARSING_STATE string_state_parsing(char *token)
 {
     message = ft_strdup(token);
+    p_info.handle_mode = STRING_HANDLE_MODE;
     h_functions[p_info.hash_mode](ft_strlen(message));
     is_an_hash_was_printed = true;
     return NO_STATE;
@@ -144,7 +151,6 @@ enum PARSING_STATE string_state_parsing(char *token)
 
 enum PARSING_STATE no_state_parsing(char *token)
 {
-    unsigned int filelen = 0;
     if (strcmp(token, "-p") == 0)
     {
         if (p_info.print_stdin_option == true) print_error(ERR_USAGE);
