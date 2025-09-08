@@ -37,8 +37,8 @@ uint8_t *pad_message(uint8_t *message, int len, int *final_len_byte)
     }
     uint64_t len64;
 
-    if (p_info.hash_mode == MD5_HASH_MODE) len64 = (uint64_t)len * 8;// stupid I am : the len MUST BE in bits not in bytes...
-    else if (p_info.hash_mode == SHA256_HASH_MODE) len64 = __bswap_64((uint64_t)len * 8);
+    if (ft_strcmp(p_info.ssl_conf->fun_name, MD5_STRING) == 0) len64 = (uint64_t)len * 8;// stupid I am : the len MUST BE in bits not in bytes...
+    else if (ft_strcmp(p_info.ssl_conf->fun_name, SHA256_STRING) == 0) len64 = __bswap_64((uint64_t)len * 8);
 
     ft_memcpy(padded_message, message, len);
 // we add the bit '1' to the message + the '0's

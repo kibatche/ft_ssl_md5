@@ -1,7 +1,6 @@
 #include "ft_ssl.h"
 
-programm_info p_info = {NO_HASH_MODE, false, false, false, false, NO_HANDLE_MODE};
-hash_function h_functions[NUMBER_OF_HASH_FUNCTIONS] = {md5_sum, sha256_sum};
+programm_info p_info = {NULL, false, false, false, false, NO_HANDLE_MODE};
 char *message = NULL;
 
 int main(int ac, char **av)

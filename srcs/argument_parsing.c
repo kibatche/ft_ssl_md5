@@ -1,7 +1,6 @@
 #include "ft_ssl.h"
 
 extern programm_info p_info;
-extern hash_function h_functions[NUMBER_OF_HASH_FUNCTIONS];
 extern char *message;
 
 bool is_an_hash_was_printed = false;
@@ -11,15 +10,19 @@ char *current_processed_filename;
 
 void parse_hash_mode(char *hash_mode)
 {
-    if (strcmp(hash_mode, MD5_STRING) == 0)
+    int i = 0;
+    ssl_config ssl_conf[] = {{&md5_sum, MD5_STRING}, {&sha256_sum, SHA256_STRING}, {NULL, NULL}};
+
+    while (ssl_conf[i].fun != NULL)
     {
-        p_info.hash_mode = MD5_HASH_MODE;
+        if (ft_strcmp(hash_mode, ssl_conf[i].fun_name) == 0)
+        {
+            p_info.ssl_conf = &ssl_conf[i];
+            return;
+        }
+        i++;
     }
-    else if (strcmp(hash_mode, SHA256_STRING) == 0)
-    {
-        p_info.hash_mode = SHA256_HASH_MODE;
-    }
-    else print_error(ERR_USAGE);
+    print_error(ERR_USAGE);
 }
 
 char *parse_stdin()
@@ -138,7 +141,7 @@ enum PARSING_STATE file_state_parsing(char *token)
         return FILE_STATE;
     current_processed_filename = token;
     p_info.handle_mode = FILE_HANDLE_MODE;
-    h_functions[p_info.hash_mode](filelen);
+    (*p_info.ssl_conf->fun)(filelen);
     return FILE_STATE;
 }
 
@@ -146,7 +149,7 @@ enum PARSING_STATE string_state_parsing(char *token)
 {
     message = ft_strdup(token);
     p_info.handle_mode = STRING_HANDLE_MODE;
-    h_functions[p_info.hash_mode](ft_strlen(message));
+    (*p_info.ssl_conf->fun)(ft_strlen(message));
     is_an_hash_was_printed = true;
     return NO_STATE;
 }
@@ -159,7 +162,7 @@ enum PARSING_STATE no_state_parsing(char *token)
         p_info.print_stdin_option = true;
         p_info.handle_mode = STDIN_COMMAND_LINE_HANDLE_MODE;
         message = parse_stdin();
-        h_functions[p_info.hash_mode](ft_strlen(message));
+        (*p_info.ssl_conf->fun)(ft_strlen(message));
         is_an_hash_was_printed = true;
         return NO_STATE;
     }
@@ -190,7 +193,7 @@ void stdin_state_parsing()
     if (message)
     {
         p_info.handle_mode = STDIN_ONLY_HANDLE_MODE;
-        h_functions[p_info.hash_mode](ft_strlen(message));
+        (*p_info.ssl_conf->fun)(ft_strlen(message));
         is_an_hash_was_printed = true;
     }
     else

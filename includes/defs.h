@@ -7,20 +7,20 @@ typedef struct t_chunked_message {
     uint32_t *word;
 }               chunked_message;
 
+typedef void (*crypto_function)(unsigned int);
+
+typedef struct t_ssl_config {
+    crypto_function fun;
+    char *fun_name;
+}               ssl_config;
+
 typedef bool OPTION;
-typedef void (*hash_function)(unsigned int);
 
 enum PARSING_STATE {
     NO_STATE,
     OPTION_STATE,
     STRING_STATE,
     FILE_STATE
-};
-
-enum HASH_MODE {
-    MD5_HASH_MODE,
-    SHA256_HASH_MODE,
-    NO_HASH_MODE,
 };
 
 enum HANDLE_MODE {
@@ -33,7 +33,7 @@ enum HANDLE_MODE {
 
 typedef struct  t_programm_info
 {
-    enum HASH_MODE hash_mode;
+    ssl_config *ssl_conf;
     OPTION string_option;
     OPTION quiet_option;
     OPTION reverse_option;
