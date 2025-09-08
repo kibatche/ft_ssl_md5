@@ -26,10 +26,8 @@ uint8_t *pad_message(uint8_t *message, int len, int *final_len_byte)
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
-    uint32_t remaining = len % 64;
-    uint32_t paddingLen = 0;
-    if (remaining >= 56) paddingLen = 56 - (64 - remaining);
-    else paddingLen = 56 - remaining;
+    uint32_t paddingLen = 1;
+    while ((len + paddingLen) % 64 != 56) paddingLen++;
     *final_len_byte = len + paddingLen + 8;// len in byte not in bit
     uint8_t *padded_message = malloc(sizeof(char) * (*final_len_byte));
     if (padded_message == NULL)

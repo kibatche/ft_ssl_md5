@@ -1,8 +1,11 @@
 obj
 objs_debug
 
-ft_ssl_md5
-ft_ssl_md5_debug
+
+file*
+
+ft_ssl
+ft_ssl_debug
 # Prerequisites
 *.d
 

@@ -68,6 +68,6 @@ void sha256_sum(unsigned int len)
         REEF(chunked_msg_array[i].word);
     }
     REEF(chunked_msg_array);
-    printf("%08x%08x%08x%08x%08x%08x%08x%08x\n", h0, h1, h2, h3, h4, h5, h6, h7);
+    print_sha256_hash(h0, h1, h2, h3, h4, h5, h6, h7);
     REEF(message);
 }

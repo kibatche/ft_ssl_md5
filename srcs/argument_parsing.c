@@ -5,7 +5,9 @@ extern hash_function h_functions[NUMBER_OF_HASH_FUNCTIONS];
 extern char *message;
 
 bool is_an_hash_was_printed = false;
+bool a_file_was_parsed = false;
 char *current_processed_filename;
+
 
 void parse_hash_mode(char *hash_mode)
 {
@@ -131,12 +133,12 @@ enum PARSING_STATE file_state_parsing(char *token)
 {
     unsigned int filelen = 0;//we need that because binary files can contain \0. Not suitable with char *.
     message = parse_file(token, &filelen);
+    a_file_was_parsed = true;
     if (message == NULL)
         return FILE_STATE;
     current_processed_filename = token;
     p_info.handle_mode = FILE_HANDLE_MODE;
     h_functions[p_info.hash_mode](filelen);
-    is_an_hash_was_printed = true;
     return FILE_STATE;
 }
 
@@ -229,6 +231,6 @@ void parse_arg(int ac, char **av)
     }
     if (parsing_state == STRING_STATE)//it mean's that the last token was -s without providing a string
         print_error(ERR_USAGE);
-    if (is_an_hash_was_printed == false)//this is to handle stdin only mode with -q or -r
+    if (is_an_hash_was_printed == false && a_file_was_parsed == false)//this is to handle stdin only mode with -q or -r
         stdin_state_parsing();
 }
