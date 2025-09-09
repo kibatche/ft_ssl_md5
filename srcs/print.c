@@ -28,7 +28,6 @@ char *change_newline()
         REEF(message);
         print_error(ERR_MALLOC);
     }
-    ft_bzero(str, len + 1);
     i = -1;
     while (++i < ft_strlen(message))
     {
